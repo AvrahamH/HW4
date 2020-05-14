@@ -2,7 +2,6 @@
 #define MAX_PRODUCT_NAME_LENGTH 20
 #define MAX_CATEGORY_LENGTH 10
 #define BARCODE_LENGTH 12
-#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include <string.h>
@@ -18,7 +17,7 @@ const char * main_interface = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"\
 "	4. Print all the products\n"\
 "	5. Update product\n"\
 "	6. EXIT SYSTEM\n"\
-"Please choose operation[1 - 6]:";
+"Please choose operation[1-6]:";
 
 //operation 1 constant strings
 
@@ -29,52 +28,53 @@ const char * adding_product_name = "Please enter product name:";
 const char * adding_product_category = "Please enter product category:";
 const char * adding_product_number = "Please enter number of products to add:";
 const char * adding_product_price = "Please enter the price of the product:";
-const char * adding_product_date = "Please enter expire date of the product[dd/mm/yy]:";
+const char * adding_product_date = "Please enter expiration date of the product[dd/mm/yy]:";
 
 //operation 2 constant strings
-const char * store_empty = "\nThe store is empty!";
-const char * delete_barcode = "\nPlease enter product barcode you want to delete:";
-const char * delete_barcode_cant_find = "\nCouldn't find the product barcode, try again...";
-const char * delete_barcode_succeed = "\nThe product deleted successfully!";
+const char * store_empty = "The store is empty!";
+const char * delete_barcode = "Please enter product barcode you want to delete:";
+const char * delete_barcode_cant_find = "Couldn't find the product barcode, try again...";
+const char * delete_barcode_succeed = "The product deleted successfully!";
 
 
 //operation 3 constant strings
-const char * expired_date_check = "\nWhat date you want to check[dd/mm/yy]:";
-const char * expired_products = "\n~~~~~~~~~~~~~~~Expired Products~~~~~~~~~~~~~~~\n";
+const char * expired_date_check = "What date you want to check[dd/mm/yy]:";
+const char * expired_products = "~~~~~~~~~~~~~~~Expired Products~~~~~~~~~~~~~~~\n";
 const char * expired_product_name = "Product name: ";
-const char * expired_product_barcode = "\nProduct barcode: ";
-const char * expired_product_date = "\nProduct expire date: ";
+const char * expired_product_barcode = "Product barcode: ";
+const char * expired_product_date = "Product expiration date: ";
 
 
 //operation 4 constant strings
-const char * print_no_products = "\nNo products in the store!\n";
-const char * print_products = "\n----------";
-const char * print_product_name = "\nProduct name: ";
-const char * print_product_barcode = "\nProduct barcode: ";
-const char * print_product_category = "\nProduct category: ";
-const char * print_product_number = "\nProduct available quantity: ";
-const char * print_product_price = "\nProduct price: ";
-const char * print_product_expireDate = "\nProduct expire date: ";
-const char * print_total_number = "\nTotal number of products: ";
+const char * print_products_head = "~~~~~~~~~~~~~~~All Products~~~~~~~~~~~~~~~\n";
+const char * print_no_products = "No products in the store!\n";
+const char * print_products = "----------";
+const char * print_product_name = "Product name: ";
+const char * print_product_barcode = "Product barcode: ";
+const char * print_product_category = "Product category: ";
+const char * print_product_number = "Product available quantity: ";
+const char * print_product_price = "Product price: ";
+const char * print_product_expireDate = "Product expiration date: ";
+const char * print_total_number = "Total number of products: ";
 
 //operation 5 constant strings
-const char * update_barcode = "\nPlease enter product barcode you want to update:";
-const char * update_barcode_notFound = "\nCouldn't find the product barcode, try again...";
-const char * update_interface_string = ("\nWhat do you want to update?\n"\
-	"        1. Product namet\n"\
-	"        2. Product category\n"\
-	"        3. Product quantity\n"\
-	"        4. Product price\n"\
-	"        5. Product expire date\n"\
+const char * update_barcode = "Please enter product barcode you want to update:";
+const char * update_barcode_notFound = "Couldn't find the product barcode, try again...";
+const char * update_interface_string = ("What do you want to update?\n"\
+	"	1. Product name\n"\
+	"	2. Product category\n"\
+	"	3. Product quantity\n"\
+	"	4. Product price\n"\
+	"	5. Product expiration date\n"\
 	"Please choose operation [1-5]:");
-const char * update_product_name = "\nPlease enter new product name:";
-const char * update_product_category = "\nPlease enter new product category:";
-const char * update_product_number = "\nPlease enter new product quantity:";
-const char * update_product_price = "\nPlease enter new product price:";
-const char * update_product_date = "\nPlease enter new product expire date[dd/mm/yy]:";
+const char * update_product_name = "Please enter new product name:";
+const char * update_product_category = "Please enter new product category:";
+const char * update_product_number = "Please enter new product quantity:";
+const char * update_product_price = "Please enter new product price:";
+const char * update_product_date = "Please enter new product expiration date[dd/mm/yy]:";
 
 //operation 6 constant strings
-exitProgram = "\nexit...";
+const char * exitProgram = "exit...";
 
 typedef struct date
 {
@@ -100,7 +100,12 @@ typedef struct super_market
 } super_market;
 
 void add_product(super_market * super) {
-
+	char barcode[BARCODE_LENGTH + 1];
+	printf("%s", print_no_products);
+	fgets(barcode, BARCODE_LENGTH, stdin);
+	for (int i = 0; i < super->number_of_products; i++)
+		for (int j = 0; barcode + j < '/0'; j++)
+			if ((super->product_list[i])->barcode == barcode)
 }
 
 void user_input(super_market * super)
@@ -115,9 +120,9 @@ void user_input(super_market * super)
 
 }
 
-int main(){
+int main() {
 	product product_lst[MAX_NUM_PRODUCTS] = 0;
-	super_market super = ( product_lst , 0);
+	super_market super = (product_lst, 0);
 	user_input(&super);
 
 
