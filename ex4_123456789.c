@@ -2,6 +2,7 @@
 #define MAX_PRODUCT_NAME_LENGTH 20
 #define MAX_CATEGORY_LENGTH 10
 #define BARCODE_LENGTH 12
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include <string.h>
@@ -21,7 +22,7 @@ const char * main_interface = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"\
 
 //operation 1 constant strings
 
-const char *  adding_product_barcode = "Please enter product barcode:";
+const char * adding_product_barcode = "Please enter product barcode:";
 const char * barcode_already_exist = "This product already exist, please enter the number of products to add:";
 const char * too_much_products = "Can't add more products, not enough space";
 const char * adding_product_name = "Please enter product name:";
@@ -99,34 +100,225 @@ typedef struct super_market
 	int number_of_products;
 } super_market;
 
-void add_product(super_market * super) {
-	char barcode[BARCODE_LENGTH + 1];
-	printf("%s", print_no_products);
-	fgets(barcode, BARCODE_LENGTH, stdin);
-	for (int i = 0; i < super->number_of_products; i++)
-		for (int j = 0; barcode + j < '/0'; j++)
-			if ((super->product_list[i])->barcode == barcode)
+/*Inputs: None
+Return parameters: new date* with allocated memory fot the variables
+Function functionality: initializing a new with allocated memory for each variable*/
+date* newDate() {
+	date *result;
+	if ((result = (date*)malloc(sizeof(date))) == NULL) {
+		printf("Failed to allocate memory\n");
+		exit(1);
+	}
+	result->day = 0;
+	result->month = 0;
+	result->year = 0;
+	return result;
 }
 
-void user_input(super_market * super)
-{
-	int user_input = 0;
-	printf("%s", main_interface);
-	scanf("%d", &user_input);
-	if (user_input == 1) {
-		add_product(super);
-
+/*Inputs: None
+Return parameters: new product* with allocated memory fot the variables
+Function functionality: initializing a new product with allocated memory for each variable*/
+product* newProduct() {
+	product *result = (product*)malloc(sizeof(product));
+	if (result == NULL) {
+		printf("Failed to allocate memory\n");
+		exit(1);
 	}
 
+	if ((result->product_name = (char*)malloc(MAX_PRODUCT_NAME_LENGTH + 1)) == NULL) {
+		printf("Failed to allocate memory\n");
+		exit(1);
+	}
+
+	if ((result->product_category = (char*)malloc(MAX_CATEGORY_LENGTH + 1)) == NULL) {
+		printf("Failed to allocate memory\n");
+		exit(1);
+	}
+
+	if ((result->barcode = (char*)malloc(BARCODE_LENGTH + 1)) == NULL) {
+		printf("Failed to allocate memory\n");
+		exit(1);
+	}
+
+	result->available = 0;
+	result->price = 0;
+	result->expire_date = newDate();
+
+	return result;
+}
+
+/*Inputs: product pointer of an existing product
+Return parameters: None
+Function functionality: freeing the allocated memory for each variable that has been allocated and finally of the received product pointer*/
+void freeProduct(product *product) {
+	free(product->product_name);
+	free(product->product_category);
+	free(product->barcode);
+	free(product->expire_date);
+	free(product);
+}
+
+/*Inputs: *str_date - string that represents the date in [dd/mm/yy] format, date pointer
+Return parameters: None
+Function functionality: converting the date string to date format and inserting it to a date pointer*/
+void str_to_date(char *str_date, date *result) {
+	result->day = (int)(str_date[0] - '0') * 10 + (int)(str_date[1] - '0');
+	result->month = (int)(str_date[3] - '0') * 10 + (int)(str_date[4] - '0');
+	result->year = (int)(str_date[6] - '0') * 10 + (int)(str_date[7] - '0');
+}
+
+/*Inputs: None
+Return parameters: new super_market* with allocated memory for the variables
+Function functionality: initializing a new super_market with allocated memory for each variable*/
+super_market* newSuper_market() {
+	super_market *result = (super_market*)malloc(sizeof(super_market));
+	if (result == NULL) {
+		printf("Failed to allocate memory\n");
+		exit(1);
+	}
+
+	if ((result->product_list = (product**)calloc(0, sizeof(product*))) == NULL) {
+		printf("Failed to allocate memory\n");
+		exit(1);
+	}
+	result->number_of_products = 0;
+	return result;
+}
+
+/*Inputs: super_market pointer of existing super_market
+Return parameters: None
+Function functionality: freeing the allocated memory for each variable that has been allocated and finally of the received super_market pointer*/
+void freeSuper_market(super_market *super) {
+	for (int i = 0; i < super->number_of_products; i++)
+		freeProduct(super->product_list[i]);
+	free(super);
+}
+
+/*Inputs: product pointer of an existing product
+Return parameters: None
+Function functionallity: printing the input product in a given format*/
+void printProduct(product *prod) {
+	printf("%s%s\n", print_product_name, prod->product_name);
+	printf("%s%s\n", print_product_barcode, prod->barcode);
+	printf("%s%s\n", print_product_category, prod->product_category);
+	printf("%s%d\n", print_product_number, prod->available);
+	printf("%s%g\n", print_product_price, prod->price);
+	printf("%s%d/%d/%d\n", print_product_expireDate, prod->expire_date->day, prod->expire_date->month, prod->expire_date->year);
+}
+
+/*Inputs: *super - supermarket to check, barcode - barcode to check
+Return parameters: int to indicate if the product exists
+Function functionality: comparing the existing barcodes at the supermarket to the barcode parameter,
+and returning 0 if it doesn't exists, or 1 if it exists*/
+int check_exist(super_market *super, char *barcode) {
+	for (int i = 0; i < super->number_of_products; i++){
+		if (!strcmp(super->product_list[i]->barcode, barcode)) {
+			printf("%s", barcode_already_exist);
+			int prod_add = 0;
+			scanf("%d", &prod_add);
+			super->product_list[i]->available += prod_add;
+			printf("Additional %d products of %s added\n", prod_add, super->product_list[i]->product_name);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+/*Inputs: existing super_market
+Return parameters: None
+Function functionality: adding a new product from user's input by creating a new product and adding it to super
+also checking if it's possible to add another product or adding more products of an existing one*/
+void addProduct(super_market * super)
+{
+	char barcode[BARCODE_LENGTH + 1];
+	printf("%s", adding_product_barcode);
+	scanf("%s", barcode);
+
+	if(check_exist(super, barcode)) return;
+
+	if (super->number_of_products == MAX_NUM_PRODUCTS) {
+		printf("%s", too_much_products);
+		return;
+	}
+	
+	product *new_product = newProduct();
+	strcpy(new_product->barcode, barcode);
+	
+	printf("%s", adding_product_name);
+	scanf("\n%[^\n]s", new_product->product_name);
+	
+	printf("%s", adding_product_category);
+	scanf("\n%[^\n]s", new_product->product_category);
+	
+	printf("%s", adding_product_number);
+	scanf("%d", &new_product->available);
+	
+	printf("%s", adding_product_price);
+	scanf("%lf", &new_product->price);
+
+	printf("%s", adding_product_date);
+	char str_date[9];
+	scanf("%s", str_date);
+	str_to_date(str_date, new_product->expire_date);
+
+	super->number_of_products++;
+
+	if ((super->product_list = realloc(super->product_list, super->number_of_products*(sizeof(product*)))) == NULL) {
+		printf("Failed to allocate memory\n");
+		exit(1);
+	}
+
+	(super->product_list)[super->number_of_products - 1] = new_product;		//inserting new_product to the super's product list
+	printf("The product %s -barcode:%s ,added successfully\n", new_product->product_name, new_product->barcode);
+}
+
+/*Inputs: super_market pointer of an existing super_market
+Return parameters: None
+Function functionallity: printing the entire supermarket by printing each product with printProduct or a message if it's empty*/
+void printSuper(super_market *super) {
+	printf("%s", print_products_head);
+	if (super->number_of_products == 0) {
+		printf("%s", print_no_products);
+		return;
+	}
+	for (int i = 0; i < super->number_of_products; i++) {
+		printf("%s\n", print_products);
+		printProduct(super->product_list[i]);
+	}
+	printf("%s%d\n", print_total_number, super->number_of_products);
+}
+
+void exitSuper(super_market *super) {
+	printf("%s", exitProgram);
+	freeSuper_market(super);
+	exit(1);
+}
+
+void user_input(super_market *super)
+{
+	int user_input = 0;
+	do {
+		printf("%s", main_interface);
+		scanf("%d", &user_input);
+		switch (user_input)
+		{
+		case 1:
+			addProduct(super);
+			break;
+		case 4:
+			printSuper(super);
+			break;
+		case 6:
+			exitSuper(super);
+		default:
+			break;
+		}
+	} while (user_input != 6);
 }
 
 int main() {
-	product product_lst[MAX_NUM_PRODUCTS] = 0;
-	super_market super = (product_lst, 0);
-	user_input(&super);
-
-
-
-
+	super_market *super = newSuper_market();
+	user_input(super);
+	
 	return 0;
 }
