@@ -193,7 +193,71 @@ void freeSuper_market(super_market *super) {
 		freeProduct(super->product_list[i]);
 	free(super);
 }
+/*Inputs: super_market pointer, index of the product that the user wish to update , and a user_input that is what he wants to update
+Return parameters: None
+Function functionallity: updating a field of a product in accordance to the user */
+void updateOpt(super_market *super, int index, int input) {
+	switch (input) {
+	case 1:
+		free(super->product_list[index]->product_name);
+		printf("%s", update_product_name);
+		if (NULL == (super->product_list[index]->product_name = (char*)malloc(MAX_PRODUCT_NAME_LENGTH + 1))) {
+			printf("Failed to allocate memory\n");
+			exit(1);
+		}
+		scanf("%s", super->product_list[index]->product_name);
+		break;
+	case 2:
+		free(super->product_list[index]->product_category);
+		printf("%s", update_product_category);
+		if (NULL == (super->product_list[index]->product_name = (char*)malloc(MAX_CATEGORY_LENGTH + 1))) {
+			printf("Failed to allocate memory\n");
+			exit(1);
+		}
+		scanf("%s", super->product_list[index]->product_category);
+		break;
+	case 3:
+		printf("%s",update_product_number);
+		scanf("%d", &super->product_list[index]->available);
+		break;
+	case 4:
+		printf("%s", update_product_price);
+		scanf("%lf", &super->product_list[index]->price);
+		break;
+	case 5:
+		printf("%s",update_product_date );
+		char str_date[9];
+		scanf("%s", str_date);
+		str_to_date(str_date, super->product_list[index]->expire_date);
+		break;
 
+	}
+}
+/*Inputs: product pointer of an existing product and a date pointer
+Return parameters: int to indicet if the product expired
+Function functionallity: retruns if a product expired or not*/
+int isExpired(product *product_date ,date *expire_date) {
+	if (expire_date-> year < product_date-> expire_date-> year)
+		return 0;
+	if (expire_date-> year > product_date-> expire_date-> year)
+		return 1;
+	if (expire_date->month < product_date->expire_date->month)
+		return 0;
+	if (expire_date-> month > product_date-> expire_date-> month)
+		return 1;
+	if (expire_date->day < product_date->expire_date->day)
+		return 0;
+	return 1;
+}
+/*Inputs: product pointer of an existing product 
+Return parameters: None
+Function functionallity: prints the expired product*/
+void printExpired(product *print_product) {
+	printf("%s%s\n", expired_product_name, print_product->product_name);
+	printf("%s%s\n", expired_product_barcode, print_product->barcode);
+	printf("%s%d/%d/%d\n", expired_product_date, print_product->expire_date->day, print_product->expire_date->month, print_product->expire_date->year);
+
+}
 /*Inputs: product pointer of an existing product
 Return parameters: None
 Function functionallity: printing the input product in a given format*/
@@ -271,6 +335,7 @@ void addProduct(super_market * super)
 	(super->product_list)[super->number_of_products - 1] = new_product;		//inserting new_product to the super's product list
 	printf("The product %s -barcode:%s ,added successfully\n", new_product->product_name, new_product->barcode);
 }
+											 
 
 /*Inputs: super_market pointer of an existing super_market
 Return parameters: None
@@ -287,7 +352,56 @@ void printSuper(super_market *super) {
 	}
 	printf("%s%d\n", print_total_number, super->number_of_products);
 }
+void removeProduct(super_market *super) {
 
+}
+/*Inputs: super_market pointer of an existing super_market
+Return parameters: None
+Function functionallity: take a date from the user and check if a product exists that expires in that date with isExpired and if
+exists prints them with printExpired*/
+void checkExpired(super_market *super) {
+	char str_date[9];
+	date  *check_date = newDate();
+	printf("%s", expired_date_check);
+	scanf("%s", str_date);
+	str_to_date(str_date, check_date);
+	printf("%s", expired_products);
+	for (int i = 0; i < super->number_of_products; i++) {
+		if (isExpired(super ->product_list[i],check_date))
+			printExpired(super->product_list[i]);
+	}
+
+}
+/*Inputs: super_market pointer
+Return parameters: None
+Function functionallity: updating a field of a product in accordance to the user */
+void UpdateProduct(super_market *super) {
+	int check_barcode = 0 , user_input ,i ;
+	char barcode[BARCODE_LENGTH + 1];
+	if (super->number_of_products == 0) {
+		printf("No products in the store!\n");
+	}
+	printf("%s", update_barcode);
+	scanf("%s", barcode);
+	while (check_barcode == 0)
+	{
+		for ( i = 0; i < super->number_of_products; i++) {
+			if (!strcmp(super->product_list[i]->barcode, barcode)) {
+				check_barcode = 1;
+				break;
+			}
+		}
+		if (check_barcode != 0)
+			break;
+		printf("%s\n", update_barcode_notFound);
+		printf("%s", update_barcode);
+		scanf("%s", barcode);		
+	} 
+	printf("%s", update_interface_string);
+	scanf("%d", &user_input);
+	updateOpt(super, i, user_input);
+
+}
 void exitSuper(super_market *super) {
 	printf("%s", exitProgram);
 	freeSuper_market(super);
@@ -305,8 +419,17 @@ void user_input(super_market *super)
 		case 1:
 			addProduct(super);
 			break;
+		case 2:
+			removeProduct(super);
+			break;
+		case 3:
+			checkExpired(super);
+			break;
 		case 4:
 			printSuper(super);
+			break;
+		case 5:
+			UpdateProduct(super);
 			break;
 		case 6:
 			exitSuper(super);
