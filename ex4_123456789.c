@@ -352,8 +352,45 @@ void printSuper(super_market *super) {
 	}
 	printf("%s%d\n", print_total_number, super->number_of_products);
 }
+/*Inputs: super_market pointer of an existing super_market
+Return parameters: None
+Function functionallity: removes a product from the super_market according to the barcode that the user puts */
 void removeProduct(super_market *super) {
+	int check_barcode = 0, i ,j;
+	char barcode[BARCODE_LENGTH + 1];
+	if (super->number_of_products == 0) {
+		printf("%s",store_empty);
+		return;
+	}
+	printf("%s", delete_barcode);
+	scanf("%s", barcode);
+	while (check_barcode == 0)
+	{
+		for (i = 0; i < super->number_of_products; i++) {
+			if (!strcmp(super->product_list[i]->barcode, barcode)) {
+				for (j = i + 1; j < super->number_of_products; j++) {
+					super->product_list[j - 1] = super->product_list[j];
+				}
+				super->number_of_products -= 1;
+				if (super->number_of_products > 0) {
+					if ((super->product_list = realloc(super->product_list, (super->number_of_products)*(sizeof(product*)))) == NULL) {
+						printf("Failed to allocate memory\n");
+						exit(1);
+					}
+				}
+				check_barcode = 1;
+				printf("%s\n", delete_barcode_succeed);
+				break;
+			}
+		}
 
+		if (check_barcode != 0)
+			break;
+		printf("%s\n", delete_barcode_cant_find);
+		printf("%s", delete_barcode);
+		scanf("%s", barcode);
+	}
+	
 }
 /*Inputs: super_market pointer of an existing super_market
 Return parameters: None
