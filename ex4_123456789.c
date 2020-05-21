@@ -243,12 +243,16 @@ void updateOpt(super_market *super, int index, int input) {
 Return parameters: int to indicate if the product expired
 Function functionallity: retruns if a product expired or not*/
 int isExpired(product *product_date ,date *expire_date) {
-	if (expire_date->year < product_date->expire_date->year) {
-		if (expire_date->month < product_date->expire_date->month) {
-			if (expire_date->day < product_date->expire_date->day)
-				return 0;
-		}
-	}
+	if (expire_date->year < product_date->expire_date->year)
+		return 0;
+	if (expire_date->year > product_date->expire_date->year)
+		return 1;
+	if (expire_date->month < product_date->expire_date->month)
+		return 0;
+	if (expire_date->month > product_date->expire_date->month)
+		return 1;
+	if (expire_date->day < product_date->expire_date->day)
+		return 0;
 	return 1;
 }
 
