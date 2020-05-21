@@ -134,8 +134,7 @@ Return parameters: new product* with allocated memory for the variables
 Function functionality: initializing a new product with allocated memory for each variable and filling it with user's input*/
 product* newProduct(char * barcode) {
 	product *result = (product*)malloc(sizeof(product));
-	if (result == NULL)
-		printFailed();
+	if (result == NULL) printFailed();
 
 	char product_name[MAX_PRODUCT_NAME_LENGTH + 1], product_category[MAX_CATEGORY_LENGTH + 1], str_date[9];
 
