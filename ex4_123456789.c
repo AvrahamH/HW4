@@ -197,6 +197,7 @@ Function functionality: freeing the allocated memory for each variable that has 
 void freeSuper_market(super_market *super) {
 	for (int i = 0; i < super->number_of_products; i++)
 		freeProduct(super->product_list[i]);
+	free(super->product_list);
 	free(super);
 }
 
@@ -344,7 +345,7 @@ void removeProduct(super_market *super) {
 	int check_barcode = 0, i ,j;
 	char barcode[BARCODE_LENGTH + 1];
 	if (super->number_of_products == 0) {
-		printf("%s",store_empty);
+		printf("%s\n",store_empty);
 		return;
 	}
 	printf("%s", delete_barcode);
@@ -353,14 +354,16 @@ void removeProduct(super_market *super) {
 	{
 		for (i = 0; i < super->number_of_products; i++) {
 			if (!strcmp(super->product_list[i]->barcode, barcode)) {
-				for (j = i + 1; j < super->number_of_products; j++) {
+				freeProduct(super->product_list[i]);
+				for (j = i + 1; j < super->number_of_products; j++)
 					super->product_list[j - 1] = super->product_list[j];
-				}
+
 				super->number_of_products -= 1;
 				if (super->number_of_products > 0) {
 					if ((super->product_list = realloc(super->product_list, (super->number_of_products)*(sizeof(product*)))) == NULL)
 						printFailed();
 				}
+
 				check_barcode = 1;
 				printf("%s\n", delete_barcode_succeed);
 				break;
@@ -428,7 +431,6 @@ Function functionallity: freeing the memory which was allocated to the supermark
 void exitSuper(super_market *super) {
 	printf("%s", exitProgram);
 	freeSuper_market(super);
-	exit(0);
 }
 
 /*Inputs: super_market pointer
