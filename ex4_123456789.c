@@ -205,19 +205,22 @@ void freeSuper_market(super_market *super) {
 Return parameters: None
 Function functionallity: updating a field of a product in accordance to the user */
 void updateOpt(super_market *super, int index, int input) {
+	char  name[MAX_PRODUCT_NAME_LENGTH + 1], category[MAX_CATEGORY_LENGTH + 1];
 	switch (input) {
 	case 1:
 		free(super->product_list[index]->product_name);
 		printf("%s", update_product_name);
-		if (NULL == (super->product_list[index]->product_name = (char*)malloc(MAX_PRODUCT_NAME_LENGTH + 1))) printFailed();
-		scanf("%s", super->product_list[index]->product_name);
+		scanf("%s", name);
+		if (NULL == (super->product_list[index]->product_name = (char*)malloc(strlen(name) + 1))) printFailed();
+		strcpy(super->product_list[index]->product_name, name);
 		break;
 
 	case 2:
 		free(super->product_list[index]->product_category);
 		printf("%s", update_product_category);
-		if (NULL == (super->product_list[index]->product_name = (char*)malloc(MAX_CATEGORY_LENGTH + 1))) printFailed();
-		scanf("%s", super->product_list[index]->product_category);
+		scanf("%s", category);
+		if (NULL == (super->product_list[index]->product_category = (char*)malloc(strlen(category) + 1))) printFailed();
+		strcpy(super->product_list[index]->product_category, category);
 		break;
 
 	case 3:
