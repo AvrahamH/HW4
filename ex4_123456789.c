@@ -441,6 +441,7 @@ void UpdateProduct(super_market *super) {
 	char barcode[BARCODE_LENGTH + 1];
 	if (super->number_of_products == 0) {
 		printf("No products in the store!\n");
+		return;
 	}
 	printf("%s", update_barcode);
 	scanf("%s", barcode);
